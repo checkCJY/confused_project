@@ -58,19 +58,56 @@ import pandas as pd
 # FR-2
 
 
-st.title("🏙️ FR-2")
+# st.title("🏙️ FR-2")
 
 
-# 1. 파일 읽어오기
-uploaded = pd.read_csv("data.csv")
+# # 1. 파일 읽어오기
+# uploaded = pd.read_csv("data.csv")
 
-# 2. 파일을 읽어오고, 파일이 있을때만 실행
-# None = 공백, 즉 없다 . uplodaded 가 None가 아닐 때.
-if uploaded is not None:
-    st.success("파일 출력 성공")
-    st.dataframe(uploaded)
-else:
-    st.info("등록된 거래가 없습니다.")
+# # 2. 파일을 읽어오고, 파일이 있을때만 실행
+# # None = 공백, 즉 없다 . uplodaded 가 None가 아닐 때.
+# if uploaded is not None:
+#     st.success("파일 출력 성공")
+#     st.dataframe(uploaded)
+# else:
+#     st.info("등록된 거래가 없습니다.")
+
+
+# FR-3
+
+df = pd.read_csv("data.csv")
+st.dataframe(df)
+st.title("🏙️ FR-3")
+
+# 계산로직 함수 
+st.write('income은 type이 수입인 내용들의 가격에 접근 후 더한다')
+st.write('expense는 type이 지출인 내용들의 가격에 접근 후 더한다')
+st.write('balance는 잔액 계산')
+
+
+def calc_summary(df):
+    income = df[df['type'] == '수입']['amount'].sum()
+    expense = df[df['type'] == '지출']['amount'].sum()
+    balance = income - expense
+    
+    return income, expense, balance
+
+income, expense, balance = calc_summary(df)
+
+# 3. 화면 표시 (st.metric 사용)
+st.subheader("회계 요약 통계")
+
+# 옵시디언 8번 자료. columns
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(label="총 수입", value=f"{income:,.0f}원")
+    
+with col2:
+    st.metric(label="총 지출", value=f"{expense:,.0f}원", delta_color="inverse")
+    
+with col3:
+    # 잔액이 0보다 크면 파란색, 작으면 빨간색으로 표시됨
+    st.metric(label="현재 잔액", value=f"{balance:,.0f}원")
 
 
 
