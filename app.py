@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(page_title="Day10 Streamlit", layout="wide")
 st.title("🏙️ 프로젝트 시작")
