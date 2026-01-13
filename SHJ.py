@@ -11,7 +11,7 @@ class Transaction:
         self.amount = amount
 
 # 2. CSV 파일 불러오기
-file_path = '/root/confused_project/data.csv'
+file_path = 'data.csv'
 
 try:
     df_local = pd.read_csv(file_path)
@@ -29,19 +29,22 @@ try:
             amount=row['amount']
         )
         transaction_list.append(obj)
+        st.write(index,row)
+    
+except FileNotFoundError:
+     st.error("파일을 찾을 수 없습니다.")
 
-
-    for tx in transaction_list:
-        if tx.ttype == "지출":
-            
+#     for tx in transaction_list:
+#         if tx.ttype == "지출":
+#             pass
       
-            st.write(f" 📂 카테고리: {tx.category} | 💰 금액: {tx.amount:,}원")g
+#             st.write(f" 📂 카테고리: {tx.category} | 💰 금액: {tx.amount:,}원")g
     
 
-except FileNotFoundError:
-    st.error("파일을 찾을 수 없습니다.")
-except KeyError as e:
-    st.error(f"CSV 컬럼명이 일치하지 않습니다: {e}")
+# except FileNotFoundError:
+#     st.error("파일을 찾을 수 없습니다.")
+# except KeyError as e:
+#     st.error(f"CSV 컬럼명이 일치하지 않습니다: {e}")
 
-df = pd.DataFrame(obj)
-st.bar_chart(df.set_index("category"))
+# df = pd.DataFrame(obj)
+# st.bar_chart(df.set_index("category"))

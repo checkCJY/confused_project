@@ -69,6 +69,7 @@ uploaded = pd.read_csv("data.csv")
 
 # 2. 파일을 읽어오고, 파일이 있을때만 실행
 # None = 공백, 즉 없다 . uplodaded 가 None가 아닐 때.
+
 if uploaded is not None:
     st.success("파일 출력 성공")
     st.dataframe(uploaded)
@@ -79,7 +80,6 @@ else:
 # FR-3
 
 df = pd.read_csv("data.csv")
-st.dataframe(df)
 st.title("🏙️ FR-3")
 
 # 계산로직 함수 간단설명
@@ -98,7 +98,7 @@ def calc_summary(df):
 # 계산하고 난 결과값을 언패킹
 income, expense, balance = calc_summary(df)
 
-# 화면 표시 (st.metric 사용)
+# 3. 화면 표시 (st.metric 사용)
 st.subheader("회계 요약 통계")
 
 # 옵시디언 8번 자료. columns
@@ -168,5 +168,3 @@ category_stats = expense_df.groupby('category')['amount'].sum()
 # 표와 막대기 형식으로 보기
 st.write(category_stats)
 st.bar_chart(category_stats)
-
-
