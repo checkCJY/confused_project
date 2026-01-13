@@ -112,35 +112,56 @@ import pandas as pd
 
 # FR-4
 
-st.title("🏙️ FR-4")
+# st.title("🏙️ FR-4")
 
-DB_FILE = "data_copy.csv"
+# DB_FILE = "data_copy.csv"
 
-# 1. 파일 로드 (실패 시 빈 데이터프레임)
-def load_data():
-    try: return pd.read_csv(DB_FILE)
-    except: return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
+# # 1. 파일 로드 (실패 시 빈 데이터프레임)
+# def load_data():
+#     try: return pd.read_csv(DB_FILE)
+#     except: return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
 
-# 2. 세션 상태 초기화
-if 'df' not in st.session_state:
-    st.session_state.df = load_data()
+# # 2. 세션 상태 초기화
+# if 'df' not in st.session_state:
+#     st.session_state.df = load_data()
 
-# 3. 입력 UI
-with st.form("entry_form", clear_on_submit=True):
-    date = st.date_input("날짜")
-    ttype = st.selectbox("구분", ["수입", "지출"])
-    category = st.text_input("어디에 사용하였는지 입력해주세요")
-    detail = st.text_input("내용을 입력해주세요", placeholder="예: 점심 식사비용")
-    value = st.number_input("금액을 입력해주세요", min_value = 0, max_value = 100000000 , step=1)
-    if st.form_submit_button("저장"):
-        # 데이터 추가 및 저장
-        new_row = pd.DataFrame([{"date": date, "type": ttype, "category":category, "description":detail, "amount": value}])
-        st.session_state.df = pd.concat([st.session_state.df, new_row], ignore_index=True)
-        st.session_state.df.to_csv(DB_FILE, index=False, encoding='utf-8-sig')
-        st.rerun()
+# # 3. 입력 UI
+# with st.form("entry_form", clear_on_submit=True):
+#     date = st.date_input("날짜")
+#     ttype = st.selectbox("구분", ["수입", "지출"])
+#     category = st.text_input("어디에 사용하였는지 입력해주세요")
+#     detail = st.text_input("내용을 입력해주세요", placeholder="예: 점심 식사비용")
+#     value = st.number_input("금액을 입력해주세요", min_value = 0, max_value = 100000000 , step=1)
+#     if st.form_submit_button("저장"):
+#         # 데이터 추가 및 저장
+#         new_row = pd.DataFrame([{"date": date, "type": ttype, "category":category, "description":detail, "amount": value}])
+#         st.session_state.df = pd.concat([st.session_state.df, new_row], ignore_index=True)
+#         st.session_state.df.to_csv(DB_FILE, index=False, encoding='utf-8-sig')
+#         st.rerun()
 
-# 4. 결과 출력
-st.dataframe(st.session_state.df, use_container_width=True)
+# # 4. 결과 출력
+# st.dataframe(st.session_state.df, use_container_width=True)
 
+# FR-5
+
+import streamlit as st
+import pandas as pd
+
+
+st.title("🏙️ FR-5")
+
+# 파일 읽어오기
+df = pd.read_csv('data.csv')
+
+# '지출' 데이터만 필터링
+expense_df = df[df['type'] == '지출']
+
+# 3. 카테고리별 합계 계산 (그룹화)
+# 옵시디언 10번 자료 groupby 검색.
+category_stats = expense_df.groupby('category')['amount'].sum()
+
+# 표와 막대기 형식으로 보기
+st.write(category_stats)
+st.bar_chart(category_stats)
 
 
