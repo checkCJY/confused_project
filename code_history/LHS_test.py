@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 
-
 class Transaction:
     def __init__(self, date, ttype, category, description, amount):
         self.date = date
@@ -46,23 +45,6 @@ def calc_summary(transactions):
     balance = income - expense
     return income, expense, balance
 
-
-# --- [메인 앱 구성] ---
-
-# 1. 초기 데이터 설정
-if 'history' not in st.session_state:
-    st.session_state.history = load_transactions()
-
-st.title("💰 가계부 관리 서비스")
-
-
-# 2. [F1] 거래 등록 UI
-st.subheader("📝 거래 등록")
-date = st.date_input("날짜")
-ttype = st.selectbox("구분", ["지출", "수입"])
-category = st.selectbox("카테고리", ["식비", "교통", "쇼핑", "급여", "기타"])
-content = st.text_input("내용")
-amount = st.number_input("금액", step=1)
 
 # --- [메인 앱 구성] ---
 
