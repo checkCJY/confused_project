@@ -45,6 +45,8 @@ if "save_list" not in st.session_state:
 #     if not st.session_state.save_list:
 #         st.info("아직 등록을 하지 않았습니다.")
 
+#D2
+
 df = pd.read_csv("data.csv")
 keyword = st.text_input("검색어 입력 (내용 포함)")
 
@@ -58,4 +60,3 @@ keyword = st.text_input("검색어 입력 (내용 포함)")
 # transactions1은 위에서 읽어온 데이터를 기반으로 하면 될것같다.
 if keyword == transactions1[0]["description"].lower():
     st.write(transactions1[0]["description"])
-
