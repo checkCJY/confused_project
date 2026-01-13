@@ -1,153 +1,118 @@
 import streamlit as st
 import pandas as pd
+import os
 
-st.set_page_config(page_title="Day10 Streamlit", layout="wide")
-st.title("🏙️ 프로젝트 시작")
-st.write("폴더 생성 → uv 환경 세팅 → 실행 성공까지 완료!")
-<<<<<<< HEAD
-st.write("이 내용이 보인다면 환경설정 완료!")
+class Transaction:
+    def __init__(self, date, ttype, category, description, amount):
+        self.date = date
+        self.ttype = ttype
+        self.category = category
+        self.description = description
+        self.amount = amount
 
-# F1
+    def output(self):
+        return [self.date, self.ttype, self.category, self.description, self.amount]
 
+def save_transactions(transactions):
+    """거래 리스트를 CSV 파일로 저장"""
+    df = pd.DataFrame(transactions, columns=["date", "type", "category", "description", "amount"])
+    df.to_csv('data.csv', index=False, encoding='utf-8-sig')
 
-함수를 정의한다 transactions
-    def __init__함수를 정의한다 ( 매개변수 입력 ):
-        self.date의 초기값은 매개변수 date의 값이 들어간다
-        self.ttype의 초기값은 매개변수 date의 값이 들어간다
-        self.category의 초기값은 매개변수 date의 값이 들어간다
-        self.description의 초기값은 매개변수 date의 값이 들어간다
-        self.amount의 초기값은 매개변수 date의 값이 들어간다
-        > self.amount = int(e)
+def load_transactions():
+    """CSV 파일에서 거래 내역 로드"""
+    if os.path.exists('data.csv'):
+        try:
+            df = pd.read_csv('data.csv', encoding='utf-8-sig')
+            if df.empty:
+                return []
+            df.columns = df.columns.str.strip()
+            expected_columns = ["date", "type", "category", "description", "amount"]
+            return df[expected_columns].values.tolist()
+        except Exception as e:
+            st.error(f"데이터 로드 오류: {e}")
+            return []
+    return []
 
-    def 등록 버튼에 관련한 함수를 정의한다 ():
-        if문으로, self.amount == int:
-            pass 
-        else :
-            금액은 숫자가 아닙니다.
-        빈 리스트를 만들고, 여기에 거래 내용에 대한 데이터를 입력
-        list_test = []
-        빈 리스트에 데이터를 넣는다
-
-        등록 버튼을 누르면 빈 리스트에는 하나의 거래가 들어간다.
-        해당 내용을 거래 목록 리스트에 추가한다
-
-
-
-
-
-# 변수 a를 선언 , 내용은 다음과 같다
-# 변수 a는 날자가 들어간다
-# 변수 b는 지출 또는 수입에 관한 내용이 들어간다
-# 변수 C는 카테고리의 내용에 대해 들어간다
-# 변수 d는 내용에 대해 들어간다
-# 변수 e는 금액에 대해 들어간다
-
-# 객체를 생성한다
-
-
-
-
-# F2 임현석님
-
-거래목록 조회
-
-Python의 Pandas 라이브러리를 사용하여 거래 목록(리스트)을 데이터프레임(DataFrame) 구조로 변환.
-데이터프레임의 컬럼명을 요구사항에 맞춰 설정:
-    (날짜, 구분, 카테고리, 내용, 금액)
-
-IF 거래 목록이 비어 있거나 존재하지 않는다면:
-    - 화면에 “등록된 거래가 없습니다.”라는 안내 메시지를 출력.
-ELSE (거래 목록에 데이터가 하나라도 있다면):
-
-Streamlit의 표 출력 기능(st.dataframe 또는 st.table)을 사용하여 화면에 표 생성
+def calc_summary(transactions):
+    """수입, 지출, 잔액 계산"""
+    income = 0
+    expense = 0
+    for item in transactions:
+        if item[1] == "수입":
+            income += item[4]
+        elif item[1] == "지출":
+            expense += item[4]
+    balance = income - expense
+    return income, expense, balance
 
 
-    클래스를 초기화하는 함수를 정의한다 (self,a,b,c)
-    def __init__(self,a,b,c):
-        각각 매개변수로 받은 값을 초기화한다
-        수입 합계와 지출 합계를 위한 변수를 정의한다
-        input = 0
-        output = 0
+# --- [메인 앱 구성] ---
 
-내가 생각했던 초기내용
-계산하는 함수를 정의한다 ()
-    현재 잔액을 변수를 0으로 초기화한다
-    매개변수로 받은 총 수입을 더한다
-    매개변수로 받은 총 지출을 더한다
-    수입의 합, 지출의 합, 현재 잔액을 넘겨준다
-    값을 반환해준다 수입, 지출, (수입-지출)
+# 1. 초기 데이터 설정
+if 'history' not in st.session_state:
+    st.session_state.history = load_transactions()
 
+st.title("💰 가계부 관리 서비스")
 
-함수를 호출하여서 변수 a,b,c 에 넣어준다
-받은 값들을 출력해준다.
+# 2. [F1] 거래 등록 UI
+st.subheader("📝 거래 등록")
+date = st.date_input("날짜")
+ttype = st.selectbox("구분", ["지출", "수입"])
+category = st.selectbox("카테고리", ["식비", "교통", "쇼핑", "급여", "기타"])
+content = st.text_input("내용")
+amount = st.number_input("금액", step=1)
 
+if st.button("등록"):
+    if amount > 0 and content.strip():
+        # 객체 생성 및 리스트 변환
+        transaction_obj = Transaction(
+            date.strftime("%Y-%m-%d"), 
+            ttype, 
+            category, 
+            content, 
+            amount
+        )
+        new_item = transaction_obj.output()
+        
+        # 데이터 추가 및 저장
+        st.session_state.history.append(new_item)
+        save_transactions(st.session_state.history)
+        
+        st.success(f"'{content}' 등록 완료!")
+        st.rerun() # 화면 갱신
+    else:
+        st.error("올바른 금액과 내용을 입력해주세요.")
 
-# F3
+# 3. [F3] 요약 통계 UI
+st.divider()
+st.subheader("📊 요약 통계")
+if st.session_state.history:
+    total_inc, total_exp, balance = calc_summary(st.session_state.history)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("총 수입", f"{total_inc:,} 원")
+    col2.metric("총 지출", f"-{total_exp:,} 원", delta_color="inverse")
+    col3.metric("현재 잔액", f"{balance:,} 원")
+else:
+    st.info("통계를 계산할 데이터가 없습니다.")
 
-스트림을 st로 부른다
-
-인컴 함수
-총 수입 합계를 변수 저장
-수입을 변수로 저장하고 수입1= a 수입2=b
-add(a, b)
-리턴 a+b
-변수를 이용해 합계 계산
-
-익스펜스 함수
-총지출 합계를 변수 저장
-총지출을 변수로 저장하고 (c, d로 변수 저장)
-add(c, d)
-반환 c+d
-변수를 이용해 합계 계산
-
-밸런스 함수
-현재 잔액(수입−지출)을 계산한다.
-sub(수입 변수, 지출 변수)
-return(수입 변수 – 지출 변수)
-
-print 출력
-
-
-# F4
-
-csv 읽어오는 함수를 정의한다
-
-df 변수에 pd.datafream을 이용해 저장한다
-
-파일을 읽어오는 함수를 정의한다
-    파일에서 읽어온 데이터를 저장하는 리스트 b 변수를 만든다
-
-    만약 csv파일이 존재하면
-        파일을 열어 데이터를 읽어온다 (주의 여기서 사용 후 닫아야함)
-        b 변수에 데이터를 넣는다
-        b를 반환한다
-    만약 csv파일이 없다면
-        b 변수는 데이터가 없다
-        b를 반환한다.
-
-거래 등록하는 함수를 정의한다()
-    새로운 빈 리스트 a 변수 를 정의한다
+# 4. [F5] 카테고리별 지출 분석 (그래프)
+st.divider()
+st.subheader("📈 카테고리별 지출 분석")
+if st.session_state.history:
+    df = pd.DataFrame(st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"])
+    expense_df = df[df["구분"] == "지출"]
     
-    조건문_ 사용자가 거래를 등록 하면
-        a 변수에 등록한 내용들을 집어 넣는다
-        그 이후 열었던 파일에 덮어쓰기로 저장한다
-        저장시 date,type,category,description,amount 순으로넣는다
-        변수에 공백제거, ','로 구분하기 위해서 strip() 함수와 join()함수를 사용한다
-        save_transactions() -> 데이터 저장
+    if not expense_df.empty:
+        category_sum = expense_df.groupby("카테고리", as_index=False)["금액"].sum()
+        st.bar_chart(data=category_sum, x="카테고리", y="금액")
+    else:
+        st.info("지출 내역이 없습니다.")
 
-
-# F5
-
-test = transactions(인자를 보냄) < 객채생성
-
-함수를 정의한다. 함수명은 임의로 output (매개변수는 객체)
-만약 test.ttype == "지출"인 경우
-    변수 a , b를 초기화한다
-    반복문을 사용해 키와 값을 추출한다, 종류랑, 값을 추출한다
-        변수 a,b에 각각 키와 값을 넣는다
-    a,b변수를 반환한다 return a,b
-
-date_test = output(test)
-st.bar_chart(date_test)
-
-st.write("이 내용이 보인다면 환경설정 완료!")
+# 5. [F2] 거래 목록 조회 UI
+st.divider()
+st.subheader("📑 거래 목록 상세")
+if st.session_state.history:
+    df = pd.DataFrame(st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"])
+    st.dataframe(df, use_container_width=True)
+else:
+    st.info("등록된 거래가 없습니다.")
