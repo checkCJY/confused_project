@@ -21,10 +21,10 @@ def main():
 
     # [2] 거래 등록 섹션
     with st.expander("📝 새 거래 등록", expanded=True):
-        c1, c2, c3 = st.columns(3)
-        date = c1.date_input("날짜")
-        ttype = c2.selectbox("구분", ["지출", "수입"])
-        category = c3.selectbox("카테고리", ["식비", "교통", "쇼핑", "급여", "기타"])
+        col1, col2, col3 = st.columns(3)
+        date = col1.date_input("날짜")
+        ttype = col2.selectbox("구분", ["지출", "수입"])
+        category = col3.selectbox("카테고리", ["식비", "교통", "쇼핑", "급여", "기타"])
         content = st.text_input("내용")
         amount = st.number_input("금액", min_value=0, step=1)
 
@@ -44,9 +44,9 @@ def main():
     # [3] 데이터 가공 및 필터링
     df_all = logic.process_dataframe(st.session_state.history)
     st.divider()
-    filter_c1, filter_c2 = st.columns(2)
-    date_range = filter_c1.date_input("기간", [df_all["date"].min(), df_all["date"].max()])
-    keyword = filter_c2.text_input("검색어")
+    filter_col1, filter_col2 = st.columns(2)
+    date_range = filter_col1.date_input("기간", [df_all["date"].min(), df_all["date"].max()])
+    keyword = filter_col2.text_input("검색어")
 
     filter_df = logic.apply_filters(df_all, date_range, keyword)
 
@@ -66,4 +66,7 @@ def main():
         ui.render_analysis_charts(filter_df)
 
 if __name__ == "__main__":
+    io = IOManager()
+    logic = FinanceLogic()
+    ui = UIRenderer()
     main()
