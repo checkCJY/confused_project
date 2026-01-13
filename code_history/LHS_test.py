@@ -16,13 +16,13 @@ class Transaction:
 def save_transactions(transactions):
     """거래 리스트를 CSV 파일로 저장"""
     df = pd.DataFrame(transactions, columns=["date", "type", "category", "description", "amount"])
-    df.to_csv(FILE_NAME, index=False, encoding='utf-8-sig')
+    df.to_csv('data.csv', index=False, encoding='utf-8-sig')
 
 def load_transactions():
     """CSV 파일에서 거래 내역 로드"""
-    if os.path.exists(FILE_NAME):
+    if os.path.exists('data.csv'):
         try:
-            df = pd.read_csv(FILE_NAME, encoding='utf-8-sig')
+            df = pd.read_csv('data.csv', encoding='utf-8-sig')
             if df.empty:
                 return []
             df.columns = df.columns.str.strip()

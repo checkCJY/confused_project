@@ -124,8 +124,7 @@ DB_FILE = "data_copy.csv"
 def load_data():
     try: 
         return pd.read_csv(DB_FILE)
-    except: 
-        return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
+    except: return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
 
 # 2. 세션 상태 초기화
 if 'df' not in st.session_state:
