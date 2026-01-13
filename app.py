@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
+
 class Transaction:
     def __init__(self, date, ttype, category, description, amount):
         self.date = date
@@ -13,16 +14,20 @@ class Transaction:
     def output(self):
         return [self.date, self.ttype, self.category, self.description, self.amount]
 
+
 def save_transactions(transactions):
     """거래 리스트를 CSV 파일로 저장"""
-    df = pd.DataFrame(transactions, columns=["date", "type", "category", "description", "amount"])
-    df.to_csv('data.csv', index=False, encoding='utf-8-sig')
+    df = pd.DataFrame(
+        transactions, columns=["date", "type", "category", "description", "amount"]
+    )
+    df.to_csv("data.csv", index=False, encoding="utf-8-sig")
+
 
 def load_transactions():
     """CSV 파일에서 거래 내역 로드"""
-    if os.path.exists('data.csv'):
+    if os.path.exists("data.csv"):
         try:
-            df = pd.read_csv('data.csv', encoding='utf-8-sig')
+            df = pd.read_csv("data.csv", encoding="utf-8-sig")
             if df.empty:
                 return []
             df.columns = df.columns.str.strip()
@@ -32,6 +37,7 @@ def load_transactions():
             st.error(f"데이터 로드 오류: {e}")
             return []
     return []
+
 
 def calc_summary(transactions):
     """수입, 지출, 잔액 계산"""
@@ -49,7 +55,7 @@ def calc_summary(transactions):
 # --- [메인 앱 구성] ---
 
 # 1. 초기 데이터 설정
-if 'history' not in st.session_state:
+if "history" not in st.session_state:
     st.session_state.history = load_transactions()
 
 st.title("💰 가계부 관리 서비스")
@@ -66,20 +72,16 @@ if st.button("등록"):
     if amount > 0 and content.strip():
         # 객체 생성 및 리스트 변환
         transaction_obj = Transaction(
-            date.strftime("%Y-%m-%d"), 
-            ttype, 
-            category, 
-            content, 
-            amount
+            date.strftime("%Y-%m-%d"), ttype, category, content, amount
         )
         new_item = transaction_obj.output()
-        
+
         # 데이터 추가 및 저장
         st.session_state.history.append(new_item)
         save_transactions(st.session_state.history)
-        
+
         st.success(f"'{content}' 등록 완료!")
-        st.rerun() # 화면 갱신
+        st.rerun()  # 화면 갱신
     else:
         st.error("올바른 금액과 내용을 입력해주세요.")
 
@@ -99,9 +101,11 @@ else:
 st.divider()
 st.subheader("📈 카테고리별 지출 분석")
 if st.session_state.history:
-    df = pd.DataFrame(st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"])
+    df = pd.DataFrame(
+        st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"]
+    )
     expense_df = df[df["구분"] == "지출"]
-    
+
     if not expense_df.empty:
         category_sum = expense_df.groupby("카테고리", as_index=False)["금액"].sum()
         st.bar_chart(data=category_sum, x="카테고리", y="금액")
@@ -112,7 +116,9 @@ if st.session_state.history:
 st.divider()
 st.subheader("📑 거래 목록 상세")
 if st.session_state.history:
-    df = pd.DataFrame(st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"])
+    df = pd.DataFrame(
+        st.session_state.history, columns=["날짜", "구분", "카테고리", "내용", "금액"]
+    )
     st.dataframe(df, use_container_width=True)
 else:
     st.info("등록된 거래가 없습니다.")

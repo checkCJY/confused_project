@@ -60,3 +60,39 @@ keyword = st.text_input("검색어 입력 (내용 포함)")
 # transactions1은 위에서 읽어온 데이터를 기반으로 하면 될것같다.
 if keyword == transactions1[0]["description"].lower():
     st.write(transactions1[0]["description"])
+
+
+# D4
+
+변수 budget = Streamlit 숫자_입력창("월 예산 입력", 최소값=0) 
+budget = st.number_input("월 예산 입력", min_value=0)
+
+// 2. 현재 총 지출액 가져오기 (이미 계산된 서비스 함수 활용) 
+변수 total_expense = calc_summary(거래_목록) 중 '지출합계' 
+
+// 3. 예산이 설정되었을 때만 계산 실행 (0으로 나누기 방지) 
+만약 budget 이 0보다 크다면: 
+if budget > 0:
+
+	// 4. 지출 비율 계산 
+	ratio = total_expense / budget
+
+	// 5. 시각적 피드백 제공 (선택 사항) 
+	화면에_표시("현재 예산 사용률: {ratio * 100}%") 
+	st.write(f"📊 현재 예산 사용률: {ratio:.1%}")
+	진행바_표시(최대 1.0 기준 ratio 값) 
+	st.progress(min(ratio, 1.0))
+
+	// 6. 조건에 따른 알림 제어 로직 
+	만약 ratio 가 1.0 이상이라면: 
+	if ratio >= 1.0:
+		에러_메시지_표시("❌ 예산을 초과했습니다!") 
+		st.error(f"❌ 예산을 초과했습니다! (초과액: {total_expense - budget:,.0f}원)")
+
+	아니고 만약 ratio 가 0.8 이상이라면: 
+	elif ratio >= 0.8:
+		경고_메시지_표시("⚠️ 예산의 80%를 사용했습니다!") 
+		st.warning(f"⚠️ 예산의 80%를 사용했습니다! 현재 {total_expense:,.0f}원 지출 중입니다.")
+		
+		그 외의 경우 (안전할 때): 
+		else: # 예산 범위 내에서 안전할 때 초록색 성공 메시지 출력 st.success(f"✅ 예산 범위 내에서 잘 관리하고 있습니다. (잔여: {budget - total_expense:,.0f}원)")
