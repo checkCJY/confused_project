@@ -2,7 +2,7 @@
 
 ---
 
-# 이 글은 git clone 으로 접속 후, 환경 설정에 관한 내용입니다.
+# 아래 내용을 보시고 순서대로 진행하시면 
 
 ```
 # 1. 원격저장소 연결 끊기, 가상환경 종료
@@ -28,7 +28,8 @@ pwd
 code -r .
 -> 현재 vscode 를 confused_project 디렉토리에서 재시작
 
-# 5. uv를 이용한 깃초기화(생략), 
+# 5. uv를 이용한 깃초기화(생략), uv 가상환경 만들기
+> 생략하는 이유는 pyproject.toml 파일이 있기 때문입니다.
 uv venv
 
 # 6. 가상환경 실행 및 pip설치
@@ -45,11 +46,20 @@ git remote -v
 
 git remote add origin https://github.com/checkCJY/confused_project.git
 
-# 9. 익스텐션에서 해당 확장자 설치 (하신분들은 안하셔도 됩니다.)
+# 9. local branch 생성 후 원격 저장소 데이터 받기
+git branch develop
+git branch feature
+git switch develop 
+    git pull origin develop
+git checkout feature
+    git pull origin feature
+
+# 10. 익스텐션에서 해당 확장자 설치 (하신분들은 안하셔도 됩니다.)
 Commit Message editor
 
-메세지 입력 칸에 마우스를 가져다 대면 연필모양이 나옵니다
-버튼을 누르면 commit 메세지를 길게 작성할 수 있어요
+tip.
+    메세지 입력 칸에 마우스를 가져다 대면 연필모양이 나옵니다
+    버튼을 누르면 commit 메세지를 길게 작성할 수 있어요
 ```
 
 
@@ -67,7 +77,8 @@ project(폴더명)
 │   ├── 참고자료.md       #5
 │   └── 흐름도_수정본.png       #6
 ├── app.py ( #3번 세팅 후 실행, 세팅확인용)
-├── main.py ( 기본으로 있던 py )
+├── code_history ( 추가 )
+│   └── 여러가지.py ( 코드 작성하고, push 받은 내용 )
 └──  requirements.txt   #7
 
 #1 commit_메세지_규칙
