@@ -55,6 +55,9 @@ keyword = st.text_input("검색어 입력 (내용 포함)")
 
 # 2. 필터링 (날짜 필터 f_df가 이미 있다고 가정)
 if keyword:
+    # 조건에 맞는 내용
+    # f_df = f_df[f_df['description'].apply(lambda x: keyword.lower() in str(x).lower())]
+    # 추가된 내용
     f_df = f_df[f_df['description'].str.contains(keyword, case=False, na=False)]
 
 # 3. 결과 출력 (목록 및 통계)
