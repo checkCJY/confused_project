@@ -45,5 +45,3 @@ if len(date_range) == 2:
 
     daily_sum = filter_df.groupby('date')['amount'].sum()
     st.line_chart(daily_sum)
-
-
