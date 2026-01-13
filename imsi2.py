@@ -45,3 +45,18 @@ if len(date_range) == 2:
 
     daily_sum = filter_df.groupby('date')['amount'].sum()
     st.line_chart(daily_sum)
+
+#D2
+
+df = pd.read_csv("data.csv")
+f_df = f_df = df.copy()
+# 1. 입력창 생성
+keyword = st.text_input("검색어 입력 (내용 포함)")
+
+# 2. 필터링 (날짜 필터 f_df가 이미 있다고 가정)
+if keyword:
+    f_df = f_df[f_df['description'].str.contains(keyword, case=False, na=False)]
+
+# 3. 결과 출력 (목록 및 통계)
+st.dataframe(f_df)  # 목록
+st.metric("검색 결과 합계", f"{f_df['amount'].sum():,}")  # 통계
