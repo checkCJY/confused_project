@@ -122,8 +122,10 @@ DB_FILE = "data_copy.csv"
 
 # 1. 파일 로드 (실패 시 빈 데이터프레임)
 def load_data():
-    try: return pd.read_csv(DB_FILE)
-    except: return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
+    try: 
+        return pd.read_csv(DB_FILE)
+    except: 
+        return pd.DataFrame(columns=['date', 'type', 'category', 'description', 'amount'])
 
 # 2. 세션 상태 초기화
 if 'df' not in st.session_state:
@@ -138,7 +140,13 @@ with st.form("entry_form", clear_on_submit=True):
     value = st.number_input("금액을 입력해주세요", min_value = 0, max_value = 100000000 , step=1)
     if st.form_submit_button("저장"):
         # 데이터 추가 및 저장
-        data_test = {"date": date, "type": ttype, "category":category, "description":detail, "amount": value}
+        data_test = {
+            "date": date, 
+            "type": ttype, 
+            "category":category, 
+            "description":detail, 
+            "amount": value
+            }
         new_row = pd.DataFrame([data_test])
         st.session_state.df = pd.concat([st.session_state.df, new_row], ignore_index=True)
         st.session_state.df.to_csv(DB_FILE, index=False, encoding='utf-8-sig')
@@ -159,7 +167,7 @@ st.title("🏙️ FR-5")
 df = pd.read_csv('data.csv')
 
 # '지출' 데이터만 필터링
-expense_df = df[df['type'] == '지출']
+expense_df = df[df['type'] == '수입']
 
 # 3. 카테고리별 합계 계산 (그룹화)
 # 옵시디언 10번 자료 groupby 검색.
@@ -168,3 +176,5 @@ category_stats = expense_df.groupby('category')['amount'].sum()
 # 표와 막대기 형식으로 보기
 st.write(category_stats)
 st.bar_chart(category_stats)
+
+
