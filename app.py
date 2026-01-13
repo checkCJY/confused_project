@@ -148,6 +148,3 @@ test = transactions(인자를 보냄) < 객채생성
 
 date_test = output(test)
 st.bar_chart(date_test)
-를 이용하는 함수를 이용해 행은 종류, 그래프는 가격으로 출력한다
-
-수정수정
