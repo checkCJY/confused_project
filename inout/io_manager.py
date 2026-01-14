@@ -2,7 +2,6 @@
 import pandas as pd
 import os
 
-
 from data import constants
 from datetime import datetime
 
@@ -22,12 +21,9 @@ class IOManager:
     def load_transactions(self):
         # CSV 파일에서 데이터를 로드하여 리스트 형식으로 반환
         if os.path.exists(self.filename):
-            # try:
             df = pd.read_csv(self.filename, encoding="utf-8-sig")
             if df.empty:
                 return []
             # pandas 데이터를 파이썬 리스트 형식으로 변환
             return df[constants.COLUMNS].values.tolist()
-            # except Exception:
-                # return []
         return []

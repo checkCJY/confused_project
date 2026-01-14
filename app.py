@@ -38,7 +38,7 @@ def main():
 
     st.divider()
 
-    # 데이터가 없으면 여기서 중단
+    # 데이터가 없으면 나온다. 나중에 파일 추가도 만들면 좋을 듯 싶다.
     if not st.session_state.history:
         st.info("데이터를 등록해주세요.")
         st.stop()
@@ -53,12 +53,14 @@ def main():
     st.divider()
     ui.render_header()
     
+    # 수입, 지출, 잔액을 받고 그 값을 출력
     inc, exp, bal = logic.calc_summary(filter_df)
     ui.render_metrics(inc, exp, bal)
     ui.render_budget_status(exp)
 
     st.divider()
 
+    # 탭으로 출력
     ui.render_tabs(filter_df)
 
 if __name__ == "__main__":

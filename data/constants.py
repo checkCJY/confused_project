@@ -1,3 +1,4 @@
+# 상수로 설정해, 하드코딩을 방지한다
 COLUMNS = ["date", "type", "category", "description", "amount"]
 CATEGORIES = ["식비", "교통", "쇼핑", "급여", "기타"]
 TYPES = ["수입", "지출"]
