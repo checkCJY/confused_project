@@ -1,0 +1,215 @@
+import streamlit as st
+import pandas as pd
+import os
+import time
+
+
+from datetime import datetime
+
+# --- [1. 기본 설정 및 클래스 정의] ---
+st.set_page_config(page_title="통합 가계부 관리", layout="wide")
+
+
+# 클래스로 객체생성
+class Transaction:
+    def __init__(self, date, ttype, category, description, amount):
+        self.date = date
+        self.ttype = ttype
+        self.category = category
+        self.description = description
+        self.amount = amount
+
+    # 객체에 대한 값을 반환할 떄 사용
+    def output(self):
+        return [self.date, self.ttype, self.category, self.description, self.amount]
+
+
+# --- [2. 데이터 관리 함수] ---
+def save_transactions(transactions):
+    """CSV 파일 저장"""
+    df = pd.DataFrame(
+        transactions, columns=["date", "type", "category", "description", "amount"]
+    )
+    df.to_csv("data/data.csv", index=False, encoding="utf-8-sig")
+
+
+# --- [2.1 파일 업로드 관련 함수] ---
+def load_transactions():
+    """CSV 파일 로드"""
+    if os.path.exists("data/data.csv"):
+        # 파일이 있는경우
+        try:
+            df = pd.read_csv("data/data.csv", encoding="utf-8-sig")
+            if df.empty:  # 파일은 읽어왔으나, 없을 경우
+                return []
+            # values.tolist()는 데이터를 "파이썬의 기본 리스트(List) 형식"으로 변환할 때 사용
+            return df[
+                ["date", "type", "category", "description", "amount"]
+            ].values.tolist()
+        # 파일이 없는 경우
+        except Exception as e:
+            st.error(f"데이터 로드 오류: {e}")
+            return []
+    return []
+
+
+# --- [2.2 수입,지출,잔액 계산] ---
+def calc_summary(transactions_df):
+    """수입, 지출, 잔액 계산 (데이터프레임 기준)"""
+    income = transactions_df[transactions_df["type"] == "수입"]["amount"].sum()
+    expense = transactions_df[transactions_df["type"] == "지출"]["amount"].sum()
+    balance = income - expense
+    # 각각 수입총합, 지출총합, 현재 잔액에 대해서
+    return income, expense, balance
+
+
+# --- [3. 초기 데이터 설정] ---
+if "history" not in st.session_state:
+    st.session_state.history = load_transactions()
+
+st.title("💰 통합 가계부 관리 서비스")
+
+# --- [4. 거래 등록 UI] ---
+# 하나의 화면을 가지고 사용
+with st.expander("📝 새 거래 등록하기", expanded=True):
+    # 화면을 3분할로
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        date = st.date_input("날짜")
+    with col2:
+        ttype = st.selectbox("구분", ["지출", "수입"])
+    with col3:
+        category = st.selectbox("카테고리", ["식비", "교통", "쇼핑", "급여", "기타"])
+    content = st.text_input("내용")
+    amount = st.number_input("금액", min_value=0, step=1)
+
+    if st.button("등록"):
+        # 데이터에 넣기위해 내용과 금액에 조건을 걸고 데이터 작성
+        if amount > 0 and content.strip():
+            new_item = Transaction(
+                # note1  date.strftime
+                # 파이썬의 날짜 객체(date object)를 특정한 형식의 문자열(String)로 변환
+                # '0000-00-00' 형태의 글자로 바꾸는 작업
+                date.strftime("%Y-%m-%d"),
+                ttype,
+                category,
+                content,
+                amount,
+            ).output()
+            st.session_state.history.append(new_item)
+            # 저장하는 함수 호출
+            save_transactions(st.session_state.history)
+            st.toast(f"✅ '{content}' 등록 완료!")
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.error("금액과 내용을 확인해주세요.")
+
+# 데이터가 없을 경우 처리
+if not st.session_state.history:
+    st.info("등록된 데이터가 없습니다. 먼저 거래를 등록해주세요.")
+    # 아래 화면을 안보여주기 위해서.
+    st.stop()
+
+# 전체 데이터를 데이터프레임으로 변환
+
+# note2 df_all 부분
+# 파이썬 리스트 형태의 데이터를 분석과 가공이 쉬운
+#'판다스 데이터프레임(Pandas DataFrame)' 구조로 변환
+df_all = pd.DataFrame(
+    st.session_state.history,
+    columns=["date", "type", "category", "description", "amount"],
+)
+# 데이터프레임 내의 '날짜' 데이터를 문자열에서 **진짜 날짜 객체(Datetime Object)**로 변환
+df_all["date"] = pd.to_datetime(df_all["date"])
+
+# --- [5. 기간 및 키워드 필터 (imsi2 로직)] ---
+st.divider()
+st.subheader("🔍 데이터 상세 필터")
+c1, c2 = st.columns(2)
+
+with c1:
+    date_range = st.date_input(
+        "기간 선택", [df_all["date"].min(), df_all["date"].max()]
+    )
+with c2:
+    keyword = st.text_input("검색어 입력 (내용 포함)")
+
+# 필터링 적용
+filter_df = df_all.copy()
+if len(date_range) == 2:
+    filter_df = filter_df[
+        # note 3 pandas의 between
+        # 특정 컬럼의 값이 두 값 사이에 있는지 확인하여
+        # 조건에 맞는 데이터만 골라내는 '범위 필터' 역할
+        filter_df["date"].between(
+            # note 4 datetime
+            # pandas 에서 컴퓨터가 날짜와 시간을 효율적으로 처리하기 위해 만든
+            # 특수한 데이터 타입을 의미
+            pd.to_datetime(date_range[0]),
+            pd.to_datetime(date_range[1]),
+        )
+    ]
+if keyword:
+    filter_df = filter_df[
+        filter_df["description"].str.contains(keyword, case=False, na=False)
+    ]
+
+# --- [6. 요약 통계 및 예산 알림 (D4 로직)] ---
+st.divider()
+total_inc, total_exp, balance = calc_summary(filter_df)
+
+col_a, col_b, col_c = st.columns(3)
+# note 5 metric
+# streamlit 대시보드에서 가장 중요한 '핵심 지표(Key Metrics)를
+# 사용자에게 한눈에 들어오도록 예쁘게 표시해주는 전용 위젯
+col_a.metric("총 수입", f"{total_inc:,} 원")
+col_b.metric("총 지출", f"-{total_exp:,} 원", delta_color="inverse")
+col_c.metric("현재 잔액", f"{balance:,} 원")
+
+# 예산 관리 섹션
+st.write("---")
+st.subheader("🏁 예산 상태 확인")
+budget = st.number_input("월 예산 설정", min_value=0, step=10000, value=1000000)
+
+if budget > 0:
+    ratio = total_exp / budget
+    st.write(f"📊 예산 사용률: **{ratio:.1%}**")
+    st.progress(min(ratio, 1.0))
+
+    if ratio >= 1.0:
+        st.error(f"❌ 예산을 초과했습니다! (초과액: {total_exp - budget:,.0f}원)")
+    elif ratio >= 0.8:
+        st.warning(f"⚠️ 예산의 80%를 사용했습니다!")
+    else:
+        st.success(
+            f"✅ 예산 범위 내에서 잘 관리하고 있습니다. (잔여: {budget - total_exp:,.0f}원)"
+        )
+
+# --- [7. 목록 및 시각화] ---
+st.divider()
+tab1, tab2 = st.tabs(["📑 거래 목록", "📈 지출 분석"])
+
+with tab1:
+    # note 6 sort
+    # pandas에서 데이터프레임의 행들을 특정 열의 값을 기준으로 정렬할 때 사용하는 함수
+    st.dataframe(
+        filter_df.sort_values("date", ascending=False), use_container_width=True
+    )
+
+with tab2:
+    exp_df = filter_df[filter_df["type"] == "지출"]
+    if not exp_df.empty:
+        # 카테고리별 차트
+        st.write("### 카테고리별 지출")
+        # note 7 groupby
+        # pandas 에서 데이터를 특정 기준에 따라 그룹으로 묶는 함수
+        cat_sum = exp_df.groupby("category")["amount"].sum()
+        st.bar_chart(cat_sum)
+
+        # 날짜별 추이 차트
+        st.write("### 일별 지출 추이")
+        daily_sum = exp_df.groupby("date")["amount"].sum()
+        st.line_chart(daily_sum)
+    else:
+        st.info("필터링된 범위 내에 지출 내역이 없습니다.")
