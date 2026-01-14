@@ -9,14 +9,11 @@ from datetime import datetime
 class IOManager:
     def __init__(self, filename="data/data.csv"):
         self.filename = filename
-        
-        
-    def save_transactions(self,transactions, filename="data/data.csv"):
+
+    def save_transactions(self, transactions, filename="data/data.csv"):
         """거래 데이터를 CSV 파일로 저장"""
-        df = pd.DataFrame(
-            transactions, columns=constants.COLUMNS)
+        df = pd.DataFrame(transactions, columns=constants.COLUMNS)
         df.to_csv(filename, index=False, encoding="utf-8-sig")
-        
 
     def load_transactions(self):
         # CSV 파일에서 데이터를 로드하여 리스트 형식으로 반환
