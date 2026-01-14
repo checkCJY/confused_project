@@ -1,6 +1,11 @@
+# 실행방법
+# python3 -m pytest test/test_finance.py 로 실행
 import pytest
 import pandas as pd
-from logic.logic_manager import Transaction, FinanceLogic  
+
+from logic.logic_manager import FinanceLogic, Transaction
+from data.constants import COLUMNS, TYPE_INCOME
+
 
 # 1. 테스트를 위한 공통 데이터(Fixture) 설정
 @pytest.fixture
