@@ -1,9 +1,9 @@
 # 파일 시스템과의 통신(읽기/쓰기)을 전담합니다.
-import pandas as pd
-import shutil
 import os
 
+from constants import COLUMNS
 from datetime import datetime
+
 
 class IOManager:
     def __init__(self, filename="data.csv"):
@@ -12,8 +12,7 @@ class IOManager:
     def save_transactions(self,transactions, filename="data.csv"):
         """거래 데이터를 CSV 파일로 저장"""
         df = pd.DataFrame(
-            transactions, columns=["date", "type", "category", "description", "amount"]
-        )
+            transactions, columns=COLUMNS)
         df.to_csv(filename, index=False, encoding="utf-8-sig")
 
     def load_transactions(self):
@@ -24,7 +23,7 @@ class IOManager:
                 if df.empty:
                     return []
                 # pandas 데이터를 파이썬 리스트 형식으로 변환
-                return df[["date", "type", "category", "description", "amount"]].values.tolist()
+                return df[[COLUMNS]].values.tolist()
             except Exception:
                 return []
         return []

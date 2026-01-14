@@ -1,5 +1,5 @@
 # 화면 레이아웃, 대시보드 지표, 차트 출력을 담당합니다.import streamlit as st
-import streamlit as st
+from constants import CATEGORIES, TYPES
 
 class UIRenderer:
     @staticmethod
@@ -44,3 +44,39 @@ class UIRenderer:
             st.line_chart(exp_df.groupby("date")["amount"].sum())
         else:
             st.info("필터링된 범위 내에 지출 내역이 없습니다.")
+    
+    @staticmethod
+    def render_input_form():
+        """거래 등록 UI를 렌더링하고 입력값을 반환"""
+        with st.expander("📝 새 거래 등록", expanded=True):
+            col1, col2, col3 = st.columns(3)
+            date = col1.date_input("날짜")
+            ttype = col2.selectbox("구분", TYPES) # 상수 적용
+            category = col3.selectbox("카테고리", CATEGORIES) # 상수 적용
+            content = st.text_input("내용")
+            amount = st.number_input("금액", min_value=0, step=1)
+            return date, ttype, category, content, amount
+
+    @staticmethod
+    def render_filter_ui(df):
+        """필터 UI를 렌더링하고 필터 조건을 반환"""
+        filter_col1, filter_col2 = st.columns(2)
+        date_range = filter_col1.date_input("기간", [df["date"].min(), df["date"].max()])
+        keyword = filter_col2.text_input("검색어")
+        return date_range, keyword
+    
+    @staticmethod
+    def render_tabs(filter_df):
+        """목록 탭과 분석 차트 탭을 렌더링"""
+        tab1, tab2 = st.tabs(["📑 목록", "📈 분석"])
+    
+        with tab1:
+            # 데이터프레임 출력 (목록)
+            st.dataframe(
+                filter_df.sort_values("date", ascending=False), 
+                use_container_width=True
+            )
+            
+        with tab2:
+            # 기존에 작성된 차트 렌더링 메서드 호출
+            UIRenderer.render_analysis_charts(filter_df)

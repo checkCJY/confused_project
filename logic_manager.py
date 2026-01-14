@@ -1,5 +1,5 @@
 # 데이터 객체 생성, 전처리, 합계 계산 등 핵심 규칙을 담당합니다.
-import pandas as pd
+from constants import COLUMNS
 
 class Transaction:
     """거래 데이터를 생성하고 리스트로 출력하는 클래스"""
@@ -17,7 +17,7 @@ class FinanceLogic:
     @staticmethod
     def process_dataframe(history):
         """리스트 데이터를 판다스 데이터프레임으로 변환 및 날짜 타입 최적화"""
-        df = pd.DataFrame(history, columns=["date", "type", "category", "description", "amount"])
+        df = pd.DataFrame(history, columns=COLUMNS) # 이런식으로 수정
         df["date"] = pd.to_datetime(df["date"])
         return df
 
