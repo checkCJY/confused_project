@@ -1,5 +1,5 @@
 # 화면 레이아웃, 대시보드 지표, 차트 출력을 담당합니다.import streamlit as st
-from constants import CATEGORIES, TYPES
+from data.constants import CATEGORIES, TYPES
 
 class UIRenderer:
     @staticmethod

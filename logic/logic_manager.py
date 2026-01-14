@@ -1,5 +1,5 @@
 # 데이터 객체 생성, 전처리, 합계 계산 등 핵심 규칙을 담당합니다.
-from constants import COLUMNS
+from data.constants import COLUMNS
 
 class Transaction:
     """거래 데이터를 생성하고 리스트로 출력하는 클래스"""

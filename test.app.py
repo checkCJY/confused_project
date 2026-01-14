@@ -1,14 +1,15 @@
 import streamlit as st
+import pandas as pd
 import time
 
-from io_manager import IOManager
-from logic_manager import FinanceLogic
-from ui_manager import UIRenderer
+from inout import io_manager
+from logic import logic_manager
+from ui import ui_manager
 
 def main():
-    io = IOManager()
-    logic = FinanceLogic()
-    ui = UIRenderer()
+    io = io_manager.IOManager()
+    logic = logic_manager.FinanceLogic()
+    ui = ui_manager.UIRenderer()
     
     st.set_page_config(page_title="통합 가계부 관리", layout="wide")
 
