@@ -1,5 +1,6 @@
 # 데이터 객체 생성, 전처리, 합계 계산 등 핵심 규칙을 담당합니다.
-from data.constants import COLUMNS
+import pandas as pd
+from data import constants
 
 class Transaction:
     """거래 데이터를 생성하고 리스트로 출력하는 클래스"""
@@ -17,15 +18,15 @@ class FinanceLogic:
     @staticmethod
     def process_dataframe(history):
         """리스트 데이터를 판다스 데이터프레임으로 변환 및 날짜 타입 최적화"""
-        df = pd.DataFrame(history, columns=COLUMNS) # 이런식으로 수정
+        df = pd.DataFrame(history, columns=constants.COLUMNS) # 이런식으로 수정
         df["date"] = pd.to_datetime(df["date"])
         return df
 
     @staticmethod
     def calc_summary(df):
         """데이터프레임 기준 수입, 지출 합계 및 잔액 계산"""
-        income = df[df["type"] == "수입"]["amount"].sum()
-        expense = df[df["type"] == "지출"]["amount"].sum()
+        income = df[df["type"] == constants.TYPE_INCOME]["amount"].sum()
+        expense = df[df["type"] == constants.TYPE_EXPENSE]["amount"].sum()
         balance = income - expense
         return income, expense, balance
 

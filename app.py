@@ -30,16 +30,16 @@ def save_transactions(transactions):
     df = pd.DataFrame(
         transactions, columns=["date", "type", "category", "description", "amount"]
     )
-    df.to_csv("data.csv", index=False, encoding="utf-8-sig")
+    df.to_csv("data/data.csv", index=False, encoding="utf-8-sig")
 
 
 # --- [2.1 파일 업로드 관련 함수] ---
 def load_transactions():
     """CSV 파일 로드"""
-    if os.path.exists("data.csv"):
+    if os.path.exists("data/data.csv"):
         # 파일이 있는경우
         try:
-            df = pd.read_csv("data.csv", encoding="utf-8-sig")
+            df = pd.read_csv("data/data.csv", encoding="utf-8-sig")
             if df.empty:  # 파일은 읽어왔으나, 없을 경우
                 return []
             # values.tolist()는 데이터를 "파이썬의 기본 리스트(List) 형식"으로 변환할 때 사용

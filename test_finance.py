@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from logic_manager import Transaction, FinanceLogic  
+from logic.logic_manager import Transaction, FinanceLogic  
 
 # 1. 테스트를 위한 공통 데이터(Fixture) 설정
 @pytest.fixture
