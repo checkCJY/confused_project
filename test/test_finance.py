@@ -1,6 +1,7 @@
 # 실행방법
 # python3 -m pytest test/test_finance.py 로 실행
 import pytest
+
 import pandas as pd
 
 from logic.logic_manager import FinanceLogic, Transaction
@@ -26,6 +27,7 @@ def sample_df(sample_history):
 # 2. Transaction 클래스 테스트
 def test_transaction_output():
     test_trans = Transaction("2023-01-01", "수입", "급여", "월급", 5000)
+    # 생성된 객체의 리스트 변환 결과가 입력값과 일치하는지 확인
     assert test_trans.output() == ["2023-01-01", "수입", "급여", "월급", 5000]
 
 
@@ -33,9 +35,13 @@ def test_transaction_output():
 def test_process_dataframe(sample_history):
     df = FinanceLogic.process_dataframe(sample_history)
 
+    # 결과값이 pandas 데이터프레임 형식인지 확인
     assert isinstance(df, pd.DataFrame)
+    # 전체 행의 개수가 입력한 4개와 일치하는지 확인
     assert len(df) == 4
-    assert pd.api.types.is_datetime64_any_dtype(df["date"])  # 날짜 변환 확인
+    # 'date' 컬럼이 문자열에서 datetime64(날짜 객체) 타입으로 정상 변환되었는지 확인
+    assert pd.api.types.is_datetime64_any_dtype(df["date"])
+    # 첫 번째 데이터의 금액이 정확히 저장되었는지 확인
     assert df.iloc[0]["amount"] == 5000000
 
 
@@ -43,8 +49,11 @@ def test_process_dataframe(sample_history):
 def test_calc_summary(sample_df):
     income, expense, balance = FinanceLogic.calc_summary(sample_df)
 
-    assert income == 5050000  # 5,000,000 + 50,000
-    assert expense == 100000  # 12,000 + 88,000
+    # 총 수입 합계가 5,050,000원인지 확인 (5,000,000 + 50,000)
+    assert income == 5050000
+    # 총 지출 합계가 100,000원인지 확인 (12,000 + 88,000)
+    assert expense == 100000
+    # 순수익(잔액)이 4,950,000원인지 확인 (5,050,000 - 100,000)
     assert balance == 4950000
 
 
@@ -53,7 +62,9 @@ def test_apply_filters_date(sample_df):
     date_range = ["2023-01-01", "2023-01-31"]
     filtered = FinanceLogic.apply_filters(sample_df, date_range, "")
 
-    assert len(filtered) == 3  # 1월 데이터만 3개
+    # 1월 범위 내 데이터가 3개만 추출되었는지 확인
+    assert len(filtered) == 3
+    # 필터링된 모든 데이터의 월(month) 정보가 1월인지 확인
     assert all(filtered["date"].dt.month == 1)
 
 
@@ -61,7 +72,9 @@ def test_apply_filters_date(sample_df):
 def test_apply_filters_keyword(sample_df):
     filtered = FinanceLogic.apply_filters(sample_df, [], "운동화")
 
+    # '운동화' 키워드가 포함된 행이 1개인지 확인
     assert len(filtered) == 1
+    # 필터링된 결과의 설명(description) 필드 내용이 정확한지 확인
     assert filtered.iloc[0]["description"] == "운동화"
 
 
@@ -72,6 +85,9 @@ def test_calc_summary_empty():
     )
     income, expense, balance = FinanceLogic.calc_summary(empty_df)
 
+    # 데이터가 없을 때 수입이 0원인지 확인
     assert income == 0
+    # 데이터가 없을 때 지출이 0원인지 확인
     assert expense == 0
+    # 데이터가 없을 때 잔액이 0원인지 확인
     assert balance == 0
